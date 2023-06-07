@@ -1,0 +1,5 @@
+msgpack==1.0.5
+packaging==23.1
+python-can==4.2.1
+typing-extensions==4.6.3
+wrapt==1.15.0
