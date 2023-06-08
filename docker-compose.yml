@@ -9,12 +9,13 @@ services:
     volumes:
       - ./:/app:delegated
     hostname: pican
-    networks:
-      - pican-network
+    network_mode: host
+    # networks:
+    #   - pican-network
     cap_add:
       - NET_ADMIN
     privileged: true
 
-networks:
-  pican-network:
-    name: pican-network
+# networks:
+#   pican-network:
+#     name: pican-network
