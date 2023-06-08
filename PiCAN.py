@@ -1,8 +1,10 @@
 import can
 import time
 import platform
+import frc
 
 def main():
+	frc_msg = frc.Message()
 	if platform.system() != 'Linux':
 		print('Get clowned on fool')
 		return
@@ -18,11 +20,13 @@ def main():
 		
 		# Read in messages with a 2 second looping timeout
 		while True:
-			msg = buffered_reader.get_message(2.0);
-			if msg == None:
+			can_msg = buffered_reader.get_message(2.0);
+			if can_msg == None:
 				print('no message rxed')
 			else:
-				print(msg)
+				frc_msg = frc.Message()
+				frc_msg.can_msg = can_msg
+				print(frc_msg)
 		
 
 if __name__ == '__main__':
