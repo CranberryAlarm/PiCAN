@@ -181,11 +181,24 @@ class Message():
 				return False
 				
 		return True
+		
+	def csv_row(self):
+		row = []
+		row.append(self._can_msg.timestamp)
+		row.append(hex(self._can_msg.arbitration_id))
+		row.append(self.device_type.name)
+		row.append(self.manufacturer.name)
+		row.append(self.api_class)
+		row.append(self.api_index)
+		row.append(self.device_id)
+		row.append(''.join('{:02X}'.format(x) for x in self.data))
+		return row
+		
 
 	def __str__(self):
-		if not self.is_valid():
-			return f"FRC Message INVALID"
-		elif self.is_broadcast():
-			return f"FRC Message: {self.manufacturer.name} [ID {self.device_id}] ApiIndex:{BroadcastApiIndex(self.api_index).name}  Data:0x{''.join('{:02X}'.format(x) for x in self.data)}"
-		else:
-			return f"FRC Message: {self.manufacturer.name}-{self.device_type.name} [ID {self.device_id}] ApiClass:{self.api_class} ApiIndex:{self.api_index} Data:0x{''.join('{:02X}'.format(x) for x in self.data)}"
+		#if not self.is_valid():
+		#	return f"FRC Message INVALID"
+		#if self.is_broadcast():
+		#	return f"FRC Message: {self.device_type.name} [ID {self.device_id}] ApiIndex:{BroadcastApiIndex(self.api_index).name}  Data:0x{''.join('{:02X}'.format(x) for x in self.data)}"
+		#else:
+		return f"FRC Message: {self.manufacturer.name}-{self.device_type.name} [ID {self.device_id}] ApiClass:{self.api_class} ApiIndex:{self.api_index} Data:0x{''.join('{:02X}'.format(x) for x in self.data)}"
