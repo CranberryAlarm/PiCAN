@@ -9,13 +9,65 @@ frc_can_protocol = Proto("frc_can",  "FRC CAN Protocol")
 --  API Index    (4 bits) - Varies by vendor (Ex. Jaguar: Enable, Disable, Set Setpoint, P Const, etc...)
 --  Device ID    (6 bits) - The ID of the CAN device of the particular type/manufacturer
 
-device_type = ProtoField.uint8("frc_can.device", "Device Type", base.DEC)
-device_mfr = ProtoField.uint8("frc_can.mfr", "Manufacturer", base.DEC)
-api_class = ProtoField.uint8("frc_can.api_class", "API Class", base.DEC)
-api_index = ProtoField.uint8("frc_can.api_index", "API Index", base.DEC)
-device_id = ProtoField.uint8("frc_can.id", "Device ID", base.DEC)
+local device_types = {
+    [0] = "BROADCAST",
+    [1] = "ROBOT_CTRL",
+    [2] = "MOTOR_CTRL",
+    [3] = "RELAY_CTRL",
+    [4] = "GYRO",
+    [5] = "ACCELEROMETER",
+    [6] = "ULTRASONIC",
+    [7] = "GEAR_TOOTH",
+    [8] = "PWR_DIST_MODULE",
+    [9] = "PNEUMATICS_CTRL",
+    [10] = "MISC",
+    [11] = "IO_BREAKOUT",
+    [31] = "FW_UPDATE",
+    [12] = "RESERVED"
+}
 
-frc_can_protocol.fields = {device_type,mfr,api_class,api_index,device_id}
+local mfr_types = {
+    [0] = "BROADCAST",
+    [1] = "NI",
+    [2] = "LUMINARY_MICRO",
+    [3] = "DEKA",
+    [4] = "CTRE",
+    [5] = "REV",
+    [6] = "GRAPPLE",
+    [7] = "MINDSENSORS",
+    [8] = "TEAM_USE",
+    [9] = "KAUAI_LABS",
+    [10] = "COPPERFORGE",
+    [11] = "PLAYING_WITH_FUSION",
+    [12] = "STUDICA",
+    [13] = "THRIFTY_BOT",
+    [14] = "REDUX_ROBOTICS",
+    [15] = "RESERVED"
+}
+
+local broadcast_api_indexes = {
+  [0] = "Disable",
+  [1] = "System Halt",
+  [2] = "System Reset",
+  [3] = "Device Assign",
+  [4] = "Device Query",
+  [5] = "Heartbeat",
+  [6] = "Sync",
+  [7] = "Update",
+  [8] = "Firmware Version",
+  [9] = "Enumerate",
+  [10] = "System Resume"
+}
+
+device_type = ProtoField.uint32("frc_can.device",    "Device Type",  base.DEC, device_types, 0x1F000000)
+device_mfr  = ProtoField.uint32("frc_can.mfr",       "Manufacturer", base.DEC, mfr_types,    0x00FF0000)
+api_class   = ProtoField.uint32("frc_can.api_class", "API Class",    base.DEC, NULL,         0x0000FC00)
+api_index   = ProtoField.uint32("frc_can.api_index", "API Index",    base.DEC, NULL,         0x000003C0)
+device_id   = ProtoField.uint32("frc_can.id",        "Device ID",    base.DEC, NULL,         0x0000003F)
+
+
+
+frc_can_protocol.fields = {device_type, device_mfr, api_class, api_index, device_id}
 
 function get_device_type_str(device_type)
     local device_type_str = "RESERVED"
@@ -59,6 +111,8 @@ function get_manufacturer_str(mfr)
     return mfr_str
 end
 
+local can_id_field = Field.new("can.id")
+
 function frc_can_protocol.dissector(buffer, pinfo, tree)
     length = buffer:len()
     if length == 0 then return end
@@ -67,8 +121,15 @@ function frc_can_protocol.dissector(buffer, pinfo, tree)
 
     local subtree = tree:add(frc_can_protocol, buffer(), "FRC CAN Protocol Data")
 
-    subtree:add_le(message_length, buffer(0,4))
-    subtree:add_le(request_id,     buffer(4,4))
+    local can_id = can_id_field()
+    
+    subtree:add(device_type, can_id.value)
+    subtree:add(device_mfr, can_id.value)
+    subtree:add(api_class, can_id.value)
+    subtree:add(api_index, can_id.value)
+    subtree:add(device_id, can_id.value)
+    -- subtree:add_le(message_length, buffer(0,4))
+    -- subtree:add_le(request_id,     buffer(4,4))
     -- subtree:add_le(response_to,    buffer(8,4))
 
     -- local opcode_number = buffer(12,4):le_uint()
