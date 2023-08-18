@@ -4,7 +4,7 @@ Can a Raspberry Pi collect CAN control frames, conveniently classifying messages
 ## Setup
 This program was developed on a Raspberry Pi 3 with Python 3.9.2
 
-To get started, clone this repo onto your Raspberry Pi and navigate to the repo in the terminal.
+To get started, clone this repo onto your Raspberry Pi and navigate to the repo in the terminal!
 
 For best practices, its recomended to setup a python virtual environment to avoid conflicting with the packages which may or may not already be globally installed.
 In the terminal, run the following to create a virtual environment called 'venv'
